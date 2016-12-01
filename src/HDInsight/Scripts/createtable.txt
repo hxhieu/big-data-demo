@@ -1,0 +1,6 @@
+﻿CREATE EXTERNAL TABLE Photo
+(
+	Id INT,
+	Title STRING,
+	Url STRING
+)
