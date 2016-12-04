@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Augen.AspNetCore.Identity
+namespace HDInsight.Identity
 {
     public static class Extensions
     {
@@ -14,20 +14,12 @@ namespace Augen.AspNetCore.Identity
         /// <typeparam name="TRole"></typeparam>
         /// <param name="services"></param>
         /// <param name="connectionString">NULL to use ConnectionStrings:DefaultConnection</param>
-        public static void AddAugenIdentity<TIdentity, TRole>(this IServiceCollection services, string connectionString = null)
+        public static void AddAugenIdentity<TIdentity, TRole>(this IServiceCollection services, string connectionString)
             where TIdentity : IdentityUser
             where TRole : IdentityRole
         {
-            if (!string.IsNullOrWhiteSpace(connectionString))
-            {
-                services.AddDbContext<IdentityDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-            }
-            else
-            {
-                //Default connection string
-                services.AddDbContext<IdentityDbContext>();
-            }
+            //Identity storage
+            services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionString));
 
             // Register the Identity services.
             services.AddIdentity<TIdentity, TRole>()
@@ -42,10 +34,13 @@ namespace Augen.AspNetCore.Identity
                 .AddMvcBinders()
 
                 // Enable the token endpoint (required to use the password flow).
-                //.EnableTokenEndpoint("/connect/token")
+                .EnableTokenEndpoint("/connect/token")
 
                 // Allow client applications to use the grant_type=password flow.
                 //.AllowPasswordFlow()
+                .AllowClientCredentialsFlow()
+
+                //.UseJsonWebTokens()
 
                 // During development, you can disable the HTTPS requirement.
                 .DisableHttpsRequirement()

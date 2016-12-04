@@ -1,6 +1,6 @@
-﻿using Augen.AspNetCore.Identity;
-using Augen.AspNetCore.Identity.Roles;
+﻿using Augen.AspNetCore.Identity.Roles;
 using Augen.AspNetCore.Identity.Users;
+using HDInsight.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -35,10 +35,8 @@ namespace HDInsight
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-
             services.AddMvc();
-
-            services.AddAugenIdentity<DefaultIdentityUser, DefaultIdentityRole>();
+            services.AddAugenIdentity<DefaultIdentityUser, DefaultIdentityRole>(Configuration.GetConnectionString("DefaultConnection"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -48,10 +46,11 @@ namespace HDInsight
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
-
             app.UseApplicationInsightsExceptionTelemetry();
 
-            app.UseMvc();
+            app.UseOAuthValidation();
+            app.UseOpenIddict();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
