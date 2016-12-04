@@ -22,9 +22,17 @@ namespace HDInsight.Identity
             services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionString));
 
             // Register the Identity services.
-            services.AddIdentity<TIdentity, TRole>()
-                .AddEntityFrameworkStores<IdentityDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<TIdentity, TRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<IdentityDbContext>()
+            .AddDefaultTokenProviders();
 
             // Register the OpenIddict services, including the default Entity Framework stores.
             services.AddOpenIddict<IdentityDbContext>()

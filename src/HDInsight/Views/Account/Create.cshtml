@@ -1,0 +1,21 @@
+﻿@model CreateAccountModel
+
+<h1>Create new account</h1>
+<form asp-controller="Account" asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <table>
+        <tr>
+            <td>Email</td>
+            <td>
+                <input asp-for="Email" type="text" />
+            </td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td>
+                <input asp-for="Password" type="password" />
+            </td>
+        </tr>
+    </table>
+    <button type="submit">Create</button>
+</form>

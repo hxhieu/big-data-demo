@@ -22,7 +22,8 @@
     "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
     "Microsoft.EntityFrameworkCore.Design": "1.1.0",
     "Microsoft.EntityFrameworkCore.Tools": "1.1.0-preview4-final",
-    "Augen.AspNetCore.Identity": "1.0.0-*"
+    "Augen.AspNetCore.Identity": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.1.0"
   },
 
   "tools": {

@@ -47,9 +47,16 @@ namespace HDInsight
             app.UseApplicationInsightsRequestTelemetry();
             app.UseApplicationInsightsExceptionTelemetry();
 
+            app.UseIdentity();
             app.UseOAuthValidation();
             app.UseOpenIddict();
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Account}/{action=Index}/{id?}"
+                );
+            });
         }
     }
 }

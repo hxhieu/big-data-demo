@@ -1,16 +1,32 @@
-﻿@model HDInsight.Models.Account.CreateAccountModel
+﻿@model LoginModel
 
-<h1>Create new account</h1>
-<form asp-controller="Account" asp-action="Index" method="post">
-    <table>
-        <tr>
-            <td>Email</td>
-            <td>@Html.TextBoxFor(x => x.Email)</td>
-        </tr>
-        <tr>
-            <td>Password</td>
-            <td>@Html.PasswordFor(x => x.Password)</td>
-        </tr>
-    </table>
-    <button type="submit">Create</button>
-</form>
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Welcome, @User.Identity.Name</h1>
+    <form asp-controller="Account" asp-action="Logout" method="post">
+        <button type="submit">Log out</button>
+    </form>
+    <a asp-controller="Account" asp-action="Manage">Manage my account</a>
+}
+else
+{
+    <h1>Please log in</h1>
+    <form asp-controller="Account" asp-action="Login" method="post">
+        <div asp-validation-summary="All"></div>
+        <table>
+            <tr>
+                <td>Email</td>
+                <td>
+                    <input asp-for="Email" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td>
+                    <input asp-for="Password" type="password" />
+                </td>
+            </tr>
+        </table>
+        <button type="submit">Log in</button>
+    </form>
+}
