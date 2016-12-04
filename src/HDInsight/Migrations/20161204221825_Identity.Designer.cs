@@ -8,7 +8,7 @@ using HDInsight.Identity;
 namespace HDInsight.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20161204204855_Identity")]
+    [Migration("20161204221825_Identity")]
     partial class Identity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,7 +17,20 @@ namespace HDInsight.Migrations
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Augen.AspNetCore.Identity.Roles.DefaultIdentityRole", b =>
+            modelBuilder.Entity("Augen.AspNetCore.Identity.AspNetUserOpenIddictApplication", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("AppId");
+
+                    b.HasKey("UserId", "AppId");
+
+                    b.HasIndex("AppId");
+
+                    b.ToTable("AspNetUserOpenIddictApplications");
+                });
+
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultIdentityRole", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -40,7 +53,7 @@ namespace HDInsight.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Augen.AspNetCore.Identity.Users.DefaultIdentityUser", b =>
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultIdentityUser", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -88,6 +101,75 @@ namespace HDInsight.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultOpenIddictApplication", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClientId");
+
+                    b.Property<string>("ClientSecret");
+
+                    b.Property<string>("DisplayName");
+
+                    b.Property<string>("LogoutRedirectUri");
+
+                    b.Property<string>("RedirectUri");
+
+                    b.Property<string>("Type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.ToTable("OpenIddictApplications");
+                });
+
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultOpenIddictAuthorization", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Scope");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenIddictAuthorizations");
+                });
+
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultOpenIddictScope", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenIddictScopes");
+                });
+
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultOpenIddictToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApplicationId");
+
+                    b.Property<string>("AuthorizationId");
+
+                    b.Property<string>("Type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
+
+                    b.HasIndex("AuthorizationId");
+
+                    b.ToTable("OpenIddictTokens");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
@@ -174,78 +256,33 @@ namespace HDInsight.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictApplication", b =>
+            modelBuilder.Entity("Augen.AspNetCore.Identity.AspNetUserOpenIddictApplication", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultOpenIddictApplication", "App")
+                        .WithMany("UserOpenIddictApplications")
+                        .HasForeignKey("AppId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Property<string>("ClientId");
-
-                    b.Property<string>("ClientSecret");
-
-                    b.Property<string>("DisplayName");
-
-                    b.Property<string>("LogoutRedirectUri");
-
-                    b.Property<string>("RedirectUri");
-
-                    b.Property<string>("Type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId")
-                        .IsUnique();
-
-                    b.ToTable("OpenIddictApplications");
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityUser", "User")
+                        .WithMany("UserOpenIddictApplications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("OpenIddict.OpenIddictAuthorization", b =>
+            modelBuilder.Entity("Augen.AspNetCore.Identity.DefaultOpenIddictToken", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultOpenIddictApplication")
+                        .WithMany("Tokens")
+                        .HasForeignKey("ApplicationId");
 
-                    b.Property<string>("Scope");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OpenIddictAuthorizations");
-                });
-
-            modelBuilder.Entity("OpenIddict.OpenIddictScope", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Description");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OpenIddictScopes");
-                });
-
-            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ApplicationId");
-
-                    b.Property<string>("AuthorizationId");
-
-                    b.Property<string>("Type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationId");
-
-                    b.HasIndex("AuthorizationId");
-
-                    b.ToTable("OpenIddictTokens");
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultOpenIddictAuthorization")
+                        .WithMany("Tokens")
+                        .HasForeignKey("AuthorizationId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Augen.AspNetCore.Identity.Roles.DefaultIdentityRole")
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityRole")
                         .WithMany("Claims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -253,7 +290,7 @@ namespace HDInsight.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Augen.AspNetCore.Identity.Users.DefaultIdentityUser")
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityUser")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -261,7 +298,7 @@ namespace HDInsight.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Augen.AspNetCore.Identity.Users.DefaultIdentityUser")
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityUser")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -269,26 +306,15 @@ namespace HDInsight.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Augen.AspNetCore.Identity.Roles.DefaultIdentityRole")
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityRole")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Augen.AspNetCore.Identity.Users.DefaultIdentityUser")
+                    b.HasOne("Augen.AspNetCore.Identity.DefaultIdentityUser")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("OpenIddict.OpenIddictToken", b =>
-                {
-                    b.HasOne("OpenIddict.OpenIddictApplication")
-                        .WithMany("Tokens")
-                        .HasForeignKey("ApplicationId");
-
-                    b.HasOne("OpenIddict.OpenIddictAuthorization")
-                        .WithMany("Tokens")
-                        .HasForeignKey("AuthorizationId");
                 });
         }
     }

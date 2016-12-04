@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace HDInsight.Migrations
 {
@@ -48,20 +49,6 @@ namespace HDInsight.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserTokens",
-                columns: table => new
-                {
-                    UserId = table.Column<string>(nullable: false),
-                    LoginProvider = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Value = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OpenIddictApplications",
                 columns: table => new
                 {
@@ -100,6 +87,20 @@ namespace HDInsight.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OpenIddictScopes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Value = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                 });
 
             migrationBuilder.CreateTable(
@@ -189,6 +190,30 @@ namespace HDInsight.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetUserOpenIddictApplications",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(nullable: false),
+                    AppId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserOpenIddictApplications", x => new { x.UserId, x.AppId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserOpenIddictApplications_OpenIddictApplications_AppId",
+                        column: x => x.AppId,
+                        principalTable: "OpenIddictApplications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserOpenIddictApplications_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OpenIddictTokens",
                 columns: table => new
                 {
@@ -215,6 +240,11 @@ namespace HDInsight.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserOpenIddictApplications_AppId",
+                table: "AspNetUserOpenIddictApplications",
+                column: "AppId");
+
+            migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
@@ -230,6 +260,22 @@ namespace HDInsight.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OpenIddictApplications_ClientId",
+                table: "OpenIddictApplications",
+                column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OpenIddictTokens_ApplicationId",
+                table: "OpenIddictTokens",
+                column: "ApplicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OpenIddictTokens_AuthorizationId",
+                table: "OpenIddictTokens",
+                column: "AuthorizationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -250,26 +296,19 @@ namespace HDInsight.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OpenIddictApplications_ClientId",
-                table: "OpenIddictApplications",
-                column: "ClientId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OpenIddictTokens_ApplicationId",
-                table: "OpenIddictTokens",
-                column: "ApplicationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OpenIddictTokens_AuthorizationId",
-                table: "OpenIddictTokens",
-                column: "AuthorizationId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AspNetUserOpenIddictApplications");
+
+            migrationBuilder.DropTable(
+                name: "OpenIddictScopes");
+
+            migrationBuilder.DropTable(
+                name: "OpenIddictTokens");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -286,22 +325,16 @@ namespace HDInsight.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "OpenIddictScopes");
+                name: "OpenIddictApplications");
 
             migrationBuilder.DropTable(
-                name: "OpenIddictTokens");
+                name: "OpenIddictAuthorizations");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "OpenIddictApplications");
-
-            migrationBuilder.DropTable(
-                name: "OpenIddictAuthorizations");
         }
     }
 }

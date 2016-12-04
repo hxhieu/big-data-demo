@@ -1,5 +1,4 @@
-﻿using Augen.AspNetCore.Identity.Roles;
-using Augen.AspNetCore.Identity.Users;
+﻿using Augen.AspNetCore.Identity;
 using HDInsight.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
