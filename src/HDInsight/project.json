@@ -24,7 +24,8 @@
     "Microsoft.EntityFrameworkCore.Tools": "1.1.0-preview4-final",
     "Augen.AspNetCore.Identity": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.TagHelpers": "1.1.0",
-    "Microsoft.AspNetCore.StaticFiles": "1.1.0"
+    "Microsoft.AspNetCore.StaticFiles": "1.1.0",
+    "Google.Apis.Bigquery.v2": "1.19.0.674"
   },
 
   "tools": {
@@ -32,7 +33,11 @@
   },
 
   "frameworks": {
-    "net461": {}
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Data.DataSetExtensions": "4.0.0.0"
+      }
+    }
   },
 
   "buildOptions": {
