@@ -1,6 +1,9 @@
 ﻿@model CreateAccountModel
 
 <h2>Create new account</h2>
+<div>
+    <a asp-controller="Account" asp-action="Index" class="waves-effect waves-light btn" style="margin-right: 20px">Home</a>
+</div>
 <div class="row">
     <form asp-controller="Account" asp-action="Create" method="post" class="col s12">
         <div class="row red-text">

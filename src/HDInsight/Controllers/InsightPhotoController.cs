@@ -1,31 +1,32 @@
-﻿using HDInsight.Models;
+﻿using AspNet.Security.OAuth.Validation;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Bigquery.v2;
+using Google.Apis.Bigquery.v2.Data;
+using Google.Apis.Http;
+using Google.Apis.Services;
+using HDInsight.Helpers;
+using HDInsight.Models;
 using Hyak.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Management.HDInsight.Job;
 using Microsoft.Azure.Management.HDInsight.Job.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Bigquery.v2;
-using Google.Apis.Bigquery.v2.Data;
-using System.Data;
-using Google.Apis.Services;
-using Google.Apis.Http;
-using Newtonsoft.Json;
-using HDInsight.Helpers;
 
 namespace HDInsight.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(ActiveAuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
     public class InsightPhotoController : Controller
     {
         private readonly HDInsightJobManagementClient _jobClient;
         private readonly IHostingEnvironment _env;
-
 
         private const string ExistingClusterName = "patrickquang";
         private const string ExistingClusterUri = ExistingClusterName + ".azurehdinsight.net";
@@ -133,10 +134,11 @@ namespace HDInsight.Controllers
                 };
                 BigqueryService service = new BigqueryService(initializer);
                 var dt = ExecuteSQLQuery(service, bigqueryProjectId, "SELECT Id, Title, Url FROM [dsbigquery.Photo]  limit 10");
-                if (dt != null && dt.Rows.Count > 0) {
+                if (dt != null && dt.Rows.Count > 0)
+                {
                     List<Photo> listPhoto = DataHelper.DataTableToList<Photo>(dt);
                     return Json(new HandledJsonResult { Data = listPhoto });
-                }    
+                }
                 return Json(new HandledJsonResult { Data = "No Data" });
             }
             catch (Exception ex)
@@ -144,7 +146,7 @@ namespace HDInsight.Controllers
                 return Json(new HandledJsonResult(ex));
             }
         }
-        
+
         public DataTable ExecuteSQLQuery(BigqueryService bqservice, String ProjectID, string sSql)
         {
             QueryRequest _r = new QueryRequest();
@@ -166,7 +168,7 @@ namespace HDInsight.Controllers
                 while (!(bool)result.JobComplete)
                 {
                     Thread.Sleep(1000);
-                        
+
                 }
                 if (result.JobComplete == true)
                 {
@@ -188,7 +190,7 @@ namespace HDInsight.Controllers
 
                         dt.Rows.Add(dr);
                     }
-                        
+
                     pageToken = result.PageToken;
                     if (pageToken == null)
                         break;
@@ -222,7 +224,7 @@ namespace HDInsight.Controllers
                     Defines = defines,
                     Arguments = null
                 };
-               
+
                 var jobResponse = _jobClient.JobManagement.SubmitHiveJob(parameters);
                 var jobId = jobResponse.JobSubmissionJsonResponse.Id;
                 // Wait for job completion
@@ -240,11 +242,11 @@ namespace HDInsight.Controllers
                 Stream output;
                 if (jobDetail.ExitValue == 0)
                 {
-                    output=  _jobClient.JobManagement.GetJobOutput(jobId, storageAccess);
+                    output = _jobClient.JobManagement.GetJobOutput(jobId, storageAccess);
                     using (var reader = new StreamReader(output, Encoding.UTF8))
                     {
-                         string[] lines = reader.ReadToEnd().Split("\n".ToCharArray());
-                        foreach(var line in lines)
+                        string[] lines = reader.ReadToEnd().Split("\n".ToCharArray());
+                        foreach (var line in lines)
                         {
                             if (!string.IsNullOrEmpty(line))
                             {
@@ -257,8 +259,8 @@ namespace HDInsight.Controllers
                                 photo.Url = splitContent[2];
                                 listPhoto.Add(photo);
                             }
-                            
-                        }                        
+
+                        }
                     }
                     return Json(new HandledJsonResult { Data = listPhoto });
                 }
@@ -311,7 +313,7 @@ namespace HDInsight.Controllers
                 DefaultStorageContainerName);
             IList<Photo> listPhoto = new List<Photo>();
             var result = "";
-            Stream output ; 
+            Stream output;
             if (jobDetail.ExitValue == 0) result = "success";
             else
             {
@@ -319,10 +321,10 @@ namespace HDInsight.Controllers
                 using (var reader = new StreamReader(output, Encoding.UTF8))
                 {
                     result = reader.ReadToEnd();
-                    
+
                 }
             }
-            
+
             return result;
         }
     }
