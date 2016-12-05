@@ -1,3 +1,54 @@
 ﻿@model ManageAccountModel
 
-<h1>Manage account</h1>
+<h2>Manage account</h2>
+<div>
+    <a asp-controller="Account" asp-action="Index" class="waves-effect waves-light btn" style="margin-right: 20px">Home</a>
+</div>
+
+<h4>Authentication Apps</h4>
+<div class="row">
+    @foreach (var app in Model.OpenIdApps)
+    {
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">@app.Name</span>
+                    <div>
+                        <label>Client ID:</label>
+                        @app.ClientId
+                    </div>
+                    <div>
+                        <label>Client Secret:</label>
+                        @app.ClientSecret
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a asp-controller="Account" asp-action="DeleteApp" asp-route-id="@app.Id" class="waves-effect waves-light btn red accent-4">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="row">
+    <form asp-controller="Account" asp-action="CreateApp" method="post">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Create New App</span>
+                    <div class="row red-text">
+                        <div asp-validation-summary="All"></div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input asp-for="NewAppName" type="text" class="validate" />
+                            <label for="NewAppName">Name</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <button type="submit" class="waves-effect waves-light btn">Create</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
