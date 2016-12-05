@@ -12,6 +12,8 @@ namespace HDInsight.Identity
         DefaultOpenIddictScope,
         DefaultOpenIddictToken, string>
     {
+        public DbSet<AspNetUserOpenIddictApplication> UserApplications { get; set; }
+
         public IdentityDbContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)

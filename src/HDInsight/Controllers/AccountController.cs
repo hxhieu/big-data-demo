@@ -1,10 +1,17 @@
 ﻿using Augen.AspNetCore.Identity;
+using CryptoHelper;
 using HDInsight.Identity;
 using HDInsight.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -43,9 +50,59 @@ namespace HDInsight.Controllers
             return View();
         }
 
-        public IActionResult Manage()
+        public async Task<IActionResult> Manage()
         {
-            return View();
+            var model = new ManageAccountModel
+            {
+                OpenIdApps = await GetUserOpenIdApps()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateApp(ManageAccountModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                //New app
+                var newApp = new DefaultOpenIddictApplication
+                {
+                    ClientId = Guid.NewGuid().ToString(),
+                    ClientSecret = Crypto.HashPassword(Guid.NewGuid().ToString()),
+                    DisplayName = model.NewAppName,
+                    Type = OpenIddictConstants.ClientTypes.Confidential
+                };
+
+                _identityContext.Applications.Add(newApp);
+                _identityContext.SaveChanges();
+
+                //New mapping
+                _identityContext.UserApplications.Add(new AspNetUserOpenIddictApplication
+                {
+                    AppId = newApp.Id,
+                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                });
+                _identityContext.SaveChanges();
+
+                return RedirectToAction("Manage");
+            }
+
+            model.OpenIdApps = await GetUserOpenIdApps();
+            return View("Manage", model);
+        }
+
+        public async Task<IActionResult> DeleteApp(string id)
+        {
+            _identityContext.Entry(_identityContext.UserApplications.Single(x =>
+                x.AppId == id && x.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))).State = EntityState.Deleted;
+
+            _identityContext.Entry(_identityContext.Applications.Single(x =>
+                x.Id == id)).State = EntityState.Deleted;
+
+            await _identityContext.SaveChangesAsync();
+
+            return RedirectToAction("Manage");
         }
 
         [HttpPost]
@@ -103,6 +160,33 @@ namespace HDInsight.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index");
+        }
+
+        private async Task<List<ManageAccountOpenIdAppModel>> GetUserOpenIdApps()
+        {
+            var result = new List<ManageAccountOpenIdAppModel>();
+
+            //EF Core lazy loading is not yet possible so we can't use _userManager but query the context directly with Include
+            var identityUser = await _identityContext.Users
+                .Include(x => x.UserOpenIddictApplications).ThenInclude(x => x.App)
+                .Include(x => x.UserOpenIddictApplications).ThenInclude(x => x.User)
+                .SingleAsync(x => x.UserName == User.Identity.Name);
+
+            if (identityUser != null && identityUser.UserOpenIddictApplications != null)
+            {
+                foreach (var app in identityUser.UserOpenIddictApplications.OrderBy(x => x.App.DisplayName))
+                {
+                    result.Add(new ManageAccountOpenIdAppModel
+                    {
+                        Id = app.AppId,
+                        Name = app.App.DisplayName,
+                        ClientId = app.App.ClientId,
+                        ClientSecret = app.App.ClientSecret
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }
