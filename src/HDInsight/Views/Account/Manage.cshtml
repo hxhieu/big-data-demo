@@ -9,7 +9,7 @@
 <div class="row">
     @foreach (var app in Model.OpenIdApps)
     {
-        <div class="col s12">
+        <div class="col s4">
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">@app.Name</span>
@@ -40,8 +40,14 @@
                     </div>
                     <div class="row">
                         <div class="input-field col s12">
-                            <input asp-for="NewAppName" type="text" class="validate" />
-                            <label for="NewAppName">Name</label>
+                            <input asp-for="Name" type="text" class="validate" placeholder="Enter application name" />
+                            <label for="Name">Name*</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input asp-for="Secret" type="text" class="validate" placeholder="Leave blank for new GUID secret" />
+                            <label for="Secret">Secret</label>
                         </div>
                     </div>
                 </div>

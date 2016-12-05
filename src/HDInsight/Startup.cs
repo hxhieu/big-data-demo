@@ -33,7 +33,6 @@ namespace HDInsight
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddApplicationInsightsTelemetry(Configuration);
             services.AddMvc();
             services.AddAugenIdentity<DefaultIdentityUser, DefaultIdentityRole>(Configuration.GetConnectionString("DefaultConnection"));
         }
@@ -43,9 +42,6 @@ namespace HDInsight
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
-            app.UseApplicationInsightsRequestTelemetry();
-            app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
             app.UseIdentity();

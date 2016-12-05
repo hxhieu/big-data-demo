@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using OpenIddict;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Augen.AspNetCore.Identity
 {
@@ -20,6 +21,9 @@ namespace Augen.AspNetCore.Identity
 
         public string AppId { get; set; }
         public DefaultOpenIddictApplication App { get; set; }
+
+        [Required]
+        public string SecretClearText { get; set; }
     }
 
     public class DefaultOpenIddictScope : OpenIddictScope { }

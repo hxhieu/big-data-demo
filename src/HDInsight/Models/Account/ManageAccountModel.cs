@@ -15,7 +15,8 @@ namespace HDInsight.Models.Account
     {
         public List<ManageAccountOpenIdAppModel> OpenIdApps { get; set; }
         [Required]
-        public string NewAppName { get; set; }
+        public string Name { get; set; }
+        public string Secret { get; set; }
 
         public ManageAccountModel()
         {

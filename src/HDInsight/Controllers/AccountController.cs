@@ -1,17 +1,22 @@
-﻿using Augen.AspNetCore.Identity;
+﻿using AspNet.Security.OpenIdConnect.Extensions;
+using AspNet.Security.OpenIdConnect.Primitives;
+using AspNet.Security.OpenIdConnect.Server;
+using Augen.AspNetCore.Identity;
 using CryptoHelper;
 using HDInsight.Identity;
 using HDInsight.Models.Account;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OpenIddict;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,18 +29,21 @@ namespace HDInsight.Controllers
         private readonly SignInManager<DefaultIdentityUser> _signInManager;
         private readonly RoleManager<DefaultIdentityRole> _roleManager;
         private readonly IdentityDbContext _identityContext;
+        private readonly OpenIddictApplicationManager<DefaultOpenIddictApplication> _openIdAppManager;
 
 
         public AccountController(
             UserManager<DefaultIdentityUser> userManager,
             SignInManager<DefaultIdentityUser> signInManager,
             RoleManager<DefaultIdentityRole> roleManager,
-            IdentityDbContext identityContext)
+            IdentityDbContext identityContext,
+            OpenIddictApplicationManager<DefaultOpenIddictApplication> openIdAppManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _identityContext = identityContext;
+            _openIdAppManager = openIdAppManager;
         }
 
         [AllowAnonymous]
@@ -65,29 +73,34 @@ namespace HDInsight.Controllers
         {
             if (ModelState.IsValid)
             {
-                //New app
-                var newApp = new DefaultOpenIddictApplication
+                if (string.IsNullOrEmpty(model.Secret)) model.Secret = Guid.NewGuid().ToString();
+
+                //New App
+                var newAppId = await _openIdAppManager.CreateAsync(new DefaultOpenIddictApplication
                 {
                     ClientId = Guid.NewGuid().ToString(),
-                    ClientSecret = Crypto.HashPassword(Guid.NewGuid().ToString()),
-                    DisplayName = model.NewAppName,
+                    ClientSecret = Crypto.HashPassword(model.Secret),
+                    DisplayName = model.Name,
+
+                    // Note: use "public" for JS/mobile/desktop applications
+                    // and "confidential" for server-side applications.
                     Type = OpenIddictConstants.ClientTypes.Confidential
-                };
+                });
 
-                _identityContext.Applications.Add(newApp);
-                _identityContext.SaveChanges();
-
-                //New mapping
+                //New UserApp
                 _identityContext.UserApplications.Add(new AspNetUserOpenIddictApplication
                 {
-                    AppId = newApp.Id,
-                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                    AppId = newAppId,
+                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    SecretClearText = model.Secret
                 });
+
                 _identityContext.SaveChanges();
 
                 return RedirectToAction("Manage");
             }
 
+            //Model error
             model.OpenIdApps = await GetUserOpenIdApps();
             return View("Manage", model);
         }
@@ -162,6 +175,39 @@ namespace HDInsight.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost("~/Account/GetAuthToken")]
+        [AllowAnonymous]
+        [Produces("application/json")]
+        public async Task<IActionResult> Exchange(OpenIdConnectRequest request)
+        {
+            if (request.IsClientCredentialsGrantType())
+            {
+                // Note: the client credentials are automatically validated by OpenIddict:
+                // if client_id or client_secret are invalid, this action won't be invoked.
+
+                var application = await _openIdAppManager.FindByClientIdAsync(request.ClientId);
+                if (application == null)
+                {
+                    return BadRequest(new OpenIdConnectResponse
+                    {
+                        Error = OpenIdConnectConstants.Errors.InvalidClient,
+                        ErrorDescription = "The client application was not found in the database."
+                    });
+                }
+
+                // Create a new authentication ticket.
+                var ticket = CreateTicket(request, application);
+
+                return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
+            }
+
+            return BadRequest(new OpenIdConnectResponse
+            {
+                Error = OpenIdConnectConstants.Errors.UnsupportedGrantType,
+                ErrorDescription = "The specified grant type is not supported."
+            });
+        }
+
         private async Task<List<ManageAccountOpenIdAppModel>> GetUserOpenIdApps()
         {
             var result = new List<ManageAccountOpenIdAppModel>();
@@ -181,12 +227,34 @@ namespace HDInsight.Controllers
                         Id = app.AppId,
                         Name = app.App.DisplayName,
                         ClientId = app.App.ClientId,
-                        ClientSecret = app.App.ClientSecret
+                        ClientSecret = app.SecretClearText
                     });
                 }
             }
 
             return result;
+        }
+
+        private AuthenticationTicket CreateTicket(OpenIdConnectRequest request, DefaultOpenIddictApplication application)
+        {
+            // Create a new ClaimsIdentity containing the claims that
+            // will be used to create an id_token, a token or a code.
+            var identity = new ClaimsIdentity(OpenIdConnectServerDefaults.AuthenticationScheme);
+
+            // Use the client_id as the name identifier.
+            identity.AddClaim(ClaimTypes.NameIdentifier, application.ClientId,
+                OpenIdConnectConstants.Destinations.AccessToken,
+                OpenIdConnectConstants.Destinations.IdentityToken);
+
+            identity.AddClaim(ClaimTypes.Name, application.DisplayName,
+                OpenIdConnectConstants.Destinations.AccessToken,
+                OpenIdConnectConstants.Destinations.IdentityToken);
+
+            // Create a new authentication ticket holding the user identity.
+            return new AuthenticationTicket(
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties(),
+                OpenIdConnectServerDefaults.AuthenticationScheme);
         }
     }
 }

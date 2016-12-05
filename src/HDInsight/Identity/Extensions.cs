@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Augen.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,14 +36,20 @@ namespace HDInsight.Identity
             .AddDefaultTokenProviders();
 
             // Register the OpenIddict services, including the default Entity Framework stores.
-            services.AddOpenIddict<IdentityDbContext>()
+            services.AddOpenIddict<DefaultOpenIddictApplication,
+                DefaultOpenIddictAuthorization,
+                DefaultOpenIddictScope,
+                DefaultOpenIddictToken,
+                IdentityDbContext,
+                string>()
+
                 // Register the ASP.NET Core MVC binder used by OpenIddict.
                 // Note: if you don't call this method, you won't be able to
                 // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
                 .AddMvcBinders()
 
                 // Enable the token endpoint (required to use the password flow).
-                .EnableTokenEndpoint("/connect/token")
+                .EnableTokenEndpoint("/Account/GetAuthToken")
 
                 // Allow client applications to use the grant_type=password flow.
                 //.AllowPasswordFlow()
