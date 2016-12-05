@@ -2,31 +2,33 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <h1>Welcome, @User.Identity.Name</h1>
-    <form asp-controller="Account" asp-action="Logout" method="post">
-        <button type="submit">Log out</button>
+    <h2>Welcome, @User.Identity.Name</h2>
+    <a asp-controller="Account" asp-action="Manage" class="waves-effect waves-light btn left" style="margin-right: 20px">Manage my account</a>
+    <form asp-controller="Account" asp-action="Logout" method="post" class="left">
+        <button type="submit" class="waves-effect waves-light btn red accent-4">Log out</button>
     </form>
-    <a asp-controller="Account" asp-action="Manage">Manage my account</a>
 }
 else
 {
-    <h1>Please log in</h1>
-    <form asp-controller="Account" asp-action="Login" method="post">
-        <div asp-validation-summary="All"></div>
-        <table>
-            <tr>
-                <td>Email</td>
-                <td>
-                    <input asp-for="Email" type="text" />
-                </td>
-            </tr>
-            <tr>
-                <td>Password</td>
-                <td>
-                    <input asp-for="Password" type="password" />
-                </td>
-            </tr>
-        </table>
-        <button type="submit">Log in</button>
-    </form>
+    <h2>Please log in</h2>
+    <div class="row">
+        <form asp-controller="Account" asp-action="Login" method="post" class="col s12">
+            <div class="row red-text">
+                <div asp-validation-summary="All"></div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input asp-for="Email" type="text" class="validate" />
+                    <label for="Email">Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input asp-for="Password" type="password" class="validate">
+                    <label for="Password">Password</label>
+                </div>
+            </div>
+            <button type="submit" class="waves-effect waves-light btn">Log in</button>
+        </form>
+    </div>
 }

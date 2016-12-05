@@ -47,6 +47,7 @@ namespace HDInsight
             app.UseApplicationInsightsRequestTelemetry();
             app.UseApplicationInsightsExceptionTelemetry();
 
+            app.UseStaticFiles();
             app.UseIdentity();
             app.UseOAuthValidation();
             app.UseOpenIddict();
