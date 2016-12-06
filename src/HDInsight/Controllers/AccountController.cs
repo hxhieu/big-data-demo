@@ -1,13 +1,9 @@
-﻿using AspNet.Security.OpenIdConnect.Extensions;
-using AspNet.Security.OpenIdConnect.Primitives;
-using AspNet.Security.OpenIdConnect.Server;
+﻿using AspNet.Security.OpenIdConnect.Primitives;
 using Augen.AspNetCore.Identity;
 using CryptoHelper;
 using HDInsight.Identity;
 using HDInsight.Models.Account;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
