@@ -23,27 +23,24 @@ using System.Threading.Tasks;
 namespace HDInsight.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : OpenIddictControllerBase
     {
         private readonly UserManager<DefaultIdentityUser> _userManager;
         private readonly SignInManager<DefaultIdentityUser> _signInManager;
         private readonly RoleManager<DefaultIdentityRole> _roleManager;
         private readonly IdentityDbContext _identityContext;
-        private readonly OpenIddictApplicationManager<DefaultOpenIddictApplication> _openIdAppManager;
-
 
         public AccountController(
             UserManager<DefaultIdentityUser> userManager,
             SignInManager<DefaultIdentityUser> signInManager,
             RoleManager<DefaultIdentityRole> roleManager,
             IdentityDbContext identityContext,
-            OpenIddictApplicationManager<DefaultOpenIddictApplication> openIdAppManager)
+            OpenIddictApplicationManager<DefaultOpenIddictApplication> openIdAppManager) : base(openIdAppManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _identityContext = identityContext;
-            _openIdAppManager = openIdAppManager;
         }
 
         [AllowAnonymous]
@@ -76,7 +73,7 @@ namespace HDInsight.Controllers
                 if (string.IsNullOrEmpty(model.Secret)) model.Secret = Guid.NewGuid().ToString();
 
                 //New App
-                var newAppId = await _openIdAppManager.CreateAsync(new DefaultOpenIddictApplication
+                var newAppId = await OpenIdAppManager.CreateAsync(new DefaultOpenIddictApplication
                 {
                     ClientId = Guid.NewGuid().ToString(),
                     ClientSecret = Crypto.HashPassword(model.Secret),
@@ -185,7 +182,7 @@ namespace HDInsight.Controllers
                 // Note: the client credentials are automatically validated by OpenIddict:
                 // if client_id or client_secret are invalid, this action won't be invoked.
 
-                var application = await _openIdAppManager.FindByClientIdAsync(request.ClientId);
+                var application = await OpenIdAppManager.FindByClientIdAsync(request.ClientId);
                 if (application == null)
                 {
                     return BadRequest(new OpenIdConnectResponse
@@ -233,28 +230,6 @@ namespace HDInsight.Controllers
             }
 
             return result;
-        }
-
-        private AuthenticationTicket CreateTicket(OpenIdConnectRequest request, DefaultOpenIddictApplication application)
-        {
-            // Create a new ClaimsIdentity containing the claims that
-            // will be used to create an id_token, a token or a code.
-            var identity = new ClaimsIdentity(OpenIdConnectServerDefaults.AuthenticationScheme);
-
-            // Use the client_id as the name identifier.
-            identity.AddClaim(ClaimTypes.NameIdentifier, application.ClientId,
-                OpenIdConnectConstants.Destinations.AccessToken,
-                OpenIdConnectConstants.Destinations.IdentityToken);
-
-            identity.AddClaim(ClaimTypes.Name, application.DisplayName,
-                OpenIdConnectConstants.Destinations.AccessToken,
-                OpenIdConnectConstants.Destinations.IdentityToken);
-
-            // Create a new authentication ticket holding the user identity.
-            return new AuthenticationTicket(
-                new ClaimsPrincipal(identity),
-                new AuthenticationProperties(),
-                OpenIdConnectServerDefaults.AuthenticationScheme);
         }
     }
 }

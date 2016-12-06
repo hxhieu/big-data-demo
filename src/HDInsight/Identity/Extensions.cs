@@ -1,4 +1,6 @@
 ﻿using Augen.AspNetCore.Identity;
+using HDInsight.Identity.Requirements;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +66,13 @@ namespace HDInsight.Identity
                 // shuts down. Tokens signed using this key are automatically invalidated.
                 // This method should only be used during development.
                 .AddEphemeralSigningKey();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("client_credentials", policy => policy.Requirements.Add(new ClientCredentialsRequirement()));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, ClientCredentialsAuthorizationHandler>();
         }
     }
 }
