@@ -13,7 +13,7 @@ namespace HDInsight
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:466")
+                .UseUrls("http://localhost:61675")
                 .Build();
 
             host.Run();
