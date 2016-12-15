@@ -1,0 +1,14 @@
+﻿//Create Database master
+CREATE DATABASE IF NOT EXISTS master;
+USE DATABASE master;
+//Create Table Photo
+CREATE TABLE IF NOT EXISTS master.dbo.Photo
+(
+        //Define schema of table
+        Id          int, 
+        Title           string, 
+        Url          string,
+    INDEX idx1 //Name of index
+    CLUSTERED (Id ASC) //Column to cluster by
+    PARTITIONED BY HASH (Id) //Column to partition by
+);

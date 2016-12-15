@@ -1,0 +1,18 @@
+﻿REFERENCE ASSEMBLY [Newtonsoft.Json];
+REFERENCE ASSEMBLY [Microsoft.Analytics.Samples.Formats]; 
+
+USING Microsoft.Analytics.Samples.Formats.Json;
+USE DATABASE master;
+// Extract schema specifies the properties to extract from JSON document at specified location (in this example at the root of the documents)
+
+
+@photos = 
+    SELECT 
+            Id,
+            Title,
+            Url
+    FROM [master].[dbo].[Photo];
+
+OUTPUT @photos
+TO "/Outputs/photos.json"
+USING new JsonOutputter();

@@ -15,6 +15,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HDInsight", "src\HDInsight\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Augen.AspNetCore.Identity", "src\Augen.AspNetCore.Identity\Augen.AspNetCore.Identity.xproj", "{7C70D26A-58E1-436C-A2A3-17DBE8D342C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Analytics.Samples.Formats", "..\..\..\Downloads\usql-master\usql-master\Examples\DataFormats\Microsoft.Analytics.Samples.Formats\Microsoft.Analytics.Samples.Formats.csproj", "{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{7C70D26A-58E1-436C-A2A3-17DBE8D342C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C70D26A-58E1-436C-A2A3-17DBE8D342C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C70D26A-58E1-436C-A2A3-17DBE8D342C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,5 +42,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{974DE410-7C4A-4A38-8BDA-8D5B9313B5F9} = {C37A6C71-AFB7-41CA-9907-8F04EB3CD33C}
 		{7C70D26A-58E1-436C-A2A3-17DBE8D342C1} = {C37A6C71-AFB7-41CA-9907-8F04EB3CD33C}
+		{1B3E7106-6D16-4B96-87C5-F15E18FFC08F} = {C37A6C71-AFB7-41CA-9907-8F04EB3CD33C}
 	EndGlobalSection
 EndGlobal

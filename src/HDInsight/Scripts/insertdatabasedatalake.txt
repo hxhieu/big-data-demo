@@ -1,0 +1,4 @@
+﻿USE DATABASE master;
+INSERT INTO Photo(Id,Title,Url) VALUES(1, "Test1", "http://img.f11.giaitri.vnecdn.net/2016/12/01/Vict-1480555329-8527-1480556188_300x180.jpg");
+INSERT INTO Photo(Id,Title,Url) VALUES(2, "Test2", "http://img.f11.giaitri.vnecdn.net/2016/12/01/Vict-1480555329-8527-1480556188_300x180.jpg");
+INSERT INTO Photo(Id,Title,Url) VALUES(3, "Test3", "http://img.f11.giaitri.vnecdn.net/2016/12/01/Vict-1480555329-8527-1480556188_300x180.jpg");

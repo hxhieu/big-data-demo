@@ -25,7 +25,13 @@
     "Augen.AspNetCore.Identity": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.TagHelpers": "1.1.0",
     "Microsoft.AspNetCore.StaticFiles": "1.1.0",
-    "Google.Apis.Bigquery.v2": "1.19.0.674"
+    "Google.Apis.Bigquery.v2": "1.19.0.674",
+    "Microsoft.Rest.ClientRuntime.Azure.Authentication": "2.2.9-preview",
+    "Microsoft.Azure.Common": "2.1.0",
+    "Microsoft.Azure.Management.ResourceManager": "1.4.0-preview",
+    "Microsoft.Azure.Management.DataLake.Analytics": "1.0.1-preview",
+    "Microsoft.Azure.Management.DataLake.Store": "1.0.2-preview",
+    "Microsoft.Azure.Management.DataLake.StoreUploader": "1.0.0-preview"
   },
 
   "tools": {
