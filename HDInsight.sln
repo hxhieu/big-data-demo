@@ -15,7 +15,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HDInsight", "src\HDInsight\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Augen.AspNetCore.Identity", "src\Augen.AspNetCore.Identity\Augen.AspNetCore.Identity.xproj", "{7C70D26A-58E1-436C-A2A3-17DBE8D342C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Analytics.Samples.Formats", "..\..\..\Downloads\usql-master\usql-master\Examples\DataFormats\Microsoft.Analytics.Samples.Formats\Microsoft.Analytics.Samples.Formats.csproj", "{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Analytics.Samples.Formats", "src\Microsoft.Analytics.Samples.Formats\Microsoft.Analytics.Samples.Formats.csproj", "{1B3E7106-6D16-4B96-87C5-F15E18FFC08F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
